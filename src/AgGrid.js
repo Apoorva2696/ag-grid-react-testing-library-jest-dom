@@ -10,7 +10,7 @@ import { createFakeServer, createServerSideDatasource } from './dataSource'
 import {LicenseManager} from "@ag-grid-enterprise/core";
 LicenseManager.setLicenseKey("your license key")
 
-export default class GridExample extends Component {
+export default class AgGridExample extends Component {
   constructor(props) {
     super(props);
 
@@ -56,7 +56,7 @@ export default class GridExample extends Component {
     };
   }
 
-  onGridReady =  async (params) => {
+  onGridReady =  (params) => {
 
     //sample data to be used only for testing
     const { sampleData } = this.props;
@@ -65,7 +65,7 @@ export default class GridExample extends Component {
     const fakeServer = createFakeServer(sampleData);
 
     //data source is used by ag grid to fetch 
-    const datasource =  await createServerSideDatasource(fakeServer);
+    const datasource = createServerSideDatasource(fakeServer);
     
     params.api.setServerSideDatasource(datasource);
     
@@ -81,7 +81,7 @@ export default class GridExample extends Component {
 
   render() {
     return (
-      <div style={{ width: '100%', height: '90vh', marginTop: '20px' }}>
+      <div style={{ width: '100%', height: '90vh', marginTop: '5vh' }}>
         {/*div to test grid ready */}
         {this.state.gridApi !== undefined ? <div data-testid={'grid-ready'}/>:null}
         <div

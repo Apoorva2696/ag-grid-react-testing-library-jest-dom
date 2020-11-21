@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import App from './App';
+import AgGridExample from './AgGrid';
 
 import {LicenseManager} from "@ag-grid-enterprise/core";
 LicenseManager.setLicenseKey("your license key")
@@ -23,7 +23,7 @@ describe('Server driven ag grid', () => {
   let grid = null;
 
   beforeEach(async () => {
-    grid = render(<App {...gridOptions} sampleData={rowData} columnDefs={colDefs} />);
+    grid = render(<AgGridExample {...gridOptions} sampleData={rowData} columnDefs={colDefs} />);
     const { queryByTestId } = grid;
     await  waitFor(() => queryByTestId('grid-ready') !== null)
   })
