@@ -1,6 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import App from './App';
 
+import {LicenseManager} from "@ag-grid-enterprise/core";
+LicenseManager.setLicenseKey("your license key")
+
 
 const colDefs = [
   { field: 'name', headerName: 'Name' },
@@ -19,10 +22,10 @@ const gridOptions = {
 describe('Server driven ag grid', () => {
   let grid = null;
 
-  beforeEach( async () => {
-    grid = render(<App {...gridOptions} sampleData = {rowData} columnDefs={colDefs}/>);
-    const {queryByTestId} = grid;
-    await waitFor(() => queryByTestId('grid-ready') !== null)
+  beforeEach(async () => {
+    grid = render(<App {...gridOptions} sampleData={rowData} columnDefs={colDefs} />);
+    const { queryByTestId } = grid;
+    await  waitFor(() => queryByTestId('grid-ready') !== null)
   })
 
   afterEach(() => {
@@ -30,20 +33,21 @@ describe('Server driven ag grid', () => {
     unmount();
   })
 
-  it('renders given columns', () => {
-    expect(screen.getByText('Name')).toBeInTheDocument();
-    expect(screen.getByText('Age')).toBeInTheDocument();
+  it('renders given columns', async () => {
+    await waitFor(() => expect(screen.getByText('Name')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Age')).toBeInTheDocument());
   })
 
-  // it('renders given rows', () => {
-  //   expect(screen.getByText('John')).toBeInTheDocument();
-  //   expect(screen.getByText('30')).toBeInTheDocument();
-  //   expect(screen.getByText('Rob')).toBeInTheDocument();
-  //   expect(screen.getByText('26')).toBeInTheDocument();
-  // })
+  it('renders given rows', async () => {
+    await waitFor(() => expect(screen.getByText('John')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('30')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Rob')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('26')).toBeInTheDocument());
+  })
 
   it('render rows', () => {
+    // will have two data rows and one header rows
     expect(screen.getAllByRole('row').length).toBe(4)
   })
 
-} );
+});

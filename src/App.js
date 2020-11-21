@@ -1,16 +1,23 @@
-'use strict';
 
 import React, { Component } from 'react';
-import { render } from 'react-dom';
-import axios from 'axios';
 import { AgGridReact } from '@ag-grid-community/react';
 import { ColumnsToolPanelModule, ServerSideRowModelModule } from '@ag-grid-enterprise/all-modules';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine-dark.css';
+import { createFakeServer, createServerSideDatasource } from './dataSource'
+
+// server side row model is available only in enterprise version
+import {LicenseManager} from "@ag-grid-enterprise/core";
+LicenseManager.setLicenseKey("your license key")
 
 export default class GridExample extends Component {
   constructor(props) {
     super(props);
+
+    this.state={
+      gridApi: null,
+      columnApi: null
+    }
 
     this.gridOptions = {
       modules: [ServerSideRowModelModule, ColumnsToolPanelModule],
@@ -38,38 +45,45 @@ export default class GridExample extends Component {
       },
       rowModelType: 'serverSide',
       pagination: true,
-      paginationPageSize: props.pageSize? props.pageSize:10
+      paginationPageSize: props.pageSize? props.pageSize:1000,
+      /**cache block size defines the range of start and end row in ag grid
+      * this specifies how many rows are to be received by ag grid in each request for pagination
+      *  for example if we are requesting for or receiving 10 rows then cacheBlockSize: 10 would make server side
+      * grid make its startRow and endRow to 0 and 10 respectively in 1st page, 11 to 20 in 2nd page request and so on
+      */
+      cacheBlockSize: props.pageSize? props.pageSize:1000
+      
     };
   }
 
-  onGridReady = (params) => {
+  onGridReady =  async (params) => {
 
     //sample data to be used only for testing
     const { sampleData } = this.props;
 
+    // you can eliminate the fake server when fetching actual data
+    const fakeServer = createFakeServer(sampleData);
+
+    //data source is used by ag grid to fetch 
+    const datasource =  await createServerSideDatasource(fakeServer);
+    
+    params.api.setServerSideDatasource(datasource);
+    
     /**incase of functional components you can use const gridApi =useRef()
      * and set gridApi.current = params.api in onGridReady  
      */
-    this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-
-    const updateData = () => {
-
-      // you can eliminate the fake server when fetching actual data
-      const fakeServer = createFakeServer(sampleData);
-
-      //data source is used by ag grid to fetch 
-      const datasource = createServerSideDatasource(fakeServer);
-      params.api.setServerSideDatasource(datasource);
-    };
-
-    updateData();
+    /**incase of using ref for setting up the apis like: gridApi.current = params.api
+     * or in case of functional components you can use const gridApi =useRef() and set gridApi.current = params.api in onGridReady
+     * you need to change the testing method to check for availability of grid api rather than checking for grid ready as used in this example
+     */
+    this.setState({gridApi: params.api, columnApi: params.columnApi})
   };
 
   render() {
     return (
-      <div style={{ width: '100%', height: '520px' }}>
-        {this.gridApi !== undefined ? <div data-testid={'grid-ready'}/>:null}
+      <div style={{ width: '100%', height: '90vh', marginTop: '20px' }}>
+        {/*div to test grid ready */}
+        {this.state.gridApi !== undefined ? <div data-testid={'grid-ready'}/>:null}
         <div
           id="myGrid"
           style={{
@@ -87,47 +101,5 @@ export default class GridExample extends Component {
       </div>
     );
   }
-}
-
-function createServerSideDatasource(server) {
-  return {
-    getRows: async function (params) {
-     
-      const {data} = await axios.get(
-        'https://raw.githubusercontent.com/ag-grid/ag-grid/master/grid-packages/ag-grid-docs/src/olympicWinners.json'
-      );
-      
-      // no need to call server if you are fetching data from actual server; fake server is just for this example
-      const _response = server.getData(data, params.request);
-      
-        if (_response) {
-          // rows gets populated and last row is used for pagination by ag grid
-          params.successCallback(_response.rows, _response.lastRow);
-        } else {
-          params.failCallback();
-          this.gridApi.showNoRowsOverlay();
-        }
-      
-    }
-  };
-}
-function createFakeServer(sampleData) {
-  return {
-    getData: function (data, request) {
-      const requestedRows = sampleData ? sampleData:data.slice(request.startRow, request.endRow);
-      const lastRow = getLastRowIndex(request, requestedRows);
-      console.log(requestedRows)
-      return {
-        success: true,
-        rows: requestedRows,
-        lastRow: lastRow,
-      };
-    },
-  };
-}
-function getLastRowIndex(request, results) {
-  if (!results) return undefined;
-  const currentLastRow = request.startRow + results.length;
-  return currentLastRow < request.endRow ? currentLastRow : undefined;
 }
 
