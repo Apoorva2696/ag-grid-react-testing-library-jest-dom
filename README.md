@@ -4,7 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 This project is a basic and simple example of ag-grid server side row model. This example includes server side row model pagination and testing ag-grid using react-testing-library.
 
-![ag-grid](https://pasteboard.co/JBFiJUp.png)
+![ag](https://user-images.githubusercontent.com/23259042/99943000-969abe00-2d96-11eb-806d-639a6ef9eab7.PNG)
 
 ## Available Scripts
 
