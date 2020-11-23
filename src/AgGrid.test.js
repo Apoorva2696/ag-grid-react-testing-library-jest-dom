@@ -34,6 +34,8 @@ describe('Server driven ag grid', () => {
   })
 
   it('renders given columns', async () => {
+    expect(screen.getAllByRole('columnheader').length).toBe(2)
+    
     await waitFor(() => expect(screen.getByText('Name')).toBeInTheDocument());
     await waitFor(() => expect(screen.getByText('Age')).toBeInTheDocument());
   })

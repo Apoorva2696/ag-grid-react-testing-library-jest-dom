@@ -4,7 +4,8 @@ import { AgGridReact } from '@ag-grid-community/react';
 import { ColumnsToolPanelModule, ServerSideRowModelModule } from '@ag-grid-enterprise/all-modules';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine-dark.css';
-import { createFakeServer, createServerSideDatasource } from './dataSource'
+import { createFakeServer, createServerSideDatasource } from './dataSource';
+import './AgGrid.css';
 
 // server side row model is available only in enterprise version
 import {LicenseManager} from "@ag-grid-enterprise/core";
@@ -43,6 +44,11 @@ export default class AgGridExample extends Component {
         flex: 1,
         minWidth: 100,
       },
+      rowClassRules: {
+        'rag-green': 'node.gold > 5',
+        'rag-amber': 'node.gold <= 5 && node.gold <= 3',
+        'rag-red': 'node.gold < 3'
+      },
       rowModelType: 'serverSide',
       pagination: true,
       paginationPageSize: props.pageSize? props.pageSize:1000,
@@ -69,10 +75,9 @@ export default class AgGridExample extends Component {
     
     params.api.setServerSideDatasource(datasource);
     
-    /**incase of functional components you can use const gridApi =useRef()
-     * and set gridApi.current = params.api in onGridReady  
-     */
-    /**incase of using ref for setting up the apis like: gridApi.current = params.api
+    /**incase of functional components you can use useState hook 
+     * *******************************************************
+     * incase of using ref for setting up the apis like: gridApi.current = params.api
      * or in case of functional components you can use const gridApi =useRef() and set gridApi.current = params.api in onGridReady
      * you need to change the testing method to check for availability of grid api rather than checking for grid ready as used in this example
      */

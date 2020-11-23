@@ -1,0 +1,21 @@
+
+/*custom scroll bar*/
+.ag-root ::-webkit-scrollbar {
+    width: 1em;
+}
+.ag-root ::-webkit-scrollbar-track-piece {
+    background: #505658;
+}
+.ag-root ::-webkit-scrollbar-thumb {
+    background: #939799;
+    height: 3em;
+    border-radius: 10px;
+}
+
+.rag-green {
+    background-color: aquamarine;
+}
+
+.rag-red {
+    background-color: #d36262;
+}
